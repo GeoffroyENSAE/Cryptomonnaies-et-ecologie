@@ -1,0 +1,168 @@
+import urllib
+import bs4
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import seaborn as sns
+
+
+req = urllib.request.Request('https://whattomine.com/miners',
+                             headers={'User-Agent': 'Mozilla/5.0'})
+html = urllib.request.urlopen(req).read()
+page = bs4.BeautifulSoup(html, "lxml")
+
+## Extraction des noms des mineurs 
+
+mineur=[]
+j=0
+for i in range(147):
+    e= page.find_all('td')[j].find_all('a')[0].text
+    j=j+8
+    mineur.append(e)
+    
+## Extraction des dates de sortie
+
+date=[]
+j=1
+for i in range(147):
+    e= page.find_all('td')[j].find_all('span')[0].text
+    nb_mois=0
+    mois=[]
+    for k in range(0,3):
+        mois.append(e[k])
+    annee=[]
+    if len(e)>5:
+        for k in range(4,8):
+            annee.append(e[k])
+        if mois==['J','a','n']:
+            nb_mois=nb_mois+1
+        if mois==['F','e','b']:
+            nb_mois=nb_mois+2
+        if mois==['M','a','r']:
+            nb_mois=nb_mois+3
+        if mois==['A','p','r']:
+            nb_mois=nb_mois+4
+        if mois==['M','a','y']:
+            nb_mois=nb_mois+5
+        if mois==['J','u','n']:
+            nb_mois=nb_mois+6
+        if mois==['J','u','l']:
+            nb_mois=nb_mois+7
+        if mois==['A','u','g']:
+            nb_mois=nb_mois+8
+        if mois==['S','e','p']:
+            nb_mois=nb_mois+9
+        if mois==['O','c','t']:
+            nb_mois=nb_mois+10
+        if mois==['N','o','v']:
+            nb_mois=nb_mois+11
+        if mois==['D','e','c']:
+            nb_mois=nb_mois+12
+        if annee==['2','0','1','8']:
+            nb_mois=nb_mois+0
+        if annee==['2','0','1','9']:
+            nb_mois=nb_mois+12
+        if annee==['2','0','2','0']:
+            nb_mois=nb_mois+24
+        if annee==['2','0','2','1']:
+            nb_mois=nb_mois+36
+    j=j+8
+    date.append(nb_mois)
+## Extraction du hashrate
+
+hashrate=[]
+j=2
+for i in range(147):
+    e= page.find_all('td')[j].text
+    e=e.replace(' ','')
+    e=e.replace('kh/s','*1000')
+    e=e.replace('Mh/s','*1000000')
+    e=e.replace('Gh/s','*1000000000')
+    e=e.replace('Th/s','*1000000000000')
+    j=j+8
+    hashrate.append(e)
+
+hashrate2=[]
+for e in hashrate :
+    i=0
+    t1=[]
+    t2=[]
+    while e[i]!='*' :
+        t1.append(e[i])
+        i=i+1
+    for j in range(i+1,len(e)):
+        t2.append(e[j])
+        a=''
+        b=''
+    for j in range(len(t1)):
+        a=a+t1[j]
+    for j in range(len(t2)):
+        b=b+t2[j]
+    hashrate2.append(float(a)*float(b))
+    
+    
+## Extraction du power consumption
+
+power=[]
+j=3
+for i in range(147):
+    e= page.find_all('td')[j].text
+    e=e.replace('W','')
+    e=float(e)
+    j=j+8
+    power.append(e)
+    
+## Extraction du revenue sur 24h dans le cas ou le prix de l'electricité est de 0,1$/kWh
+
+revenue=[]
+j=5
+for i in range(147):
+    e= page.find_all('td')[j].text
+    e=e.replace('$','')
+    e=float(e)
+    j=j+8
+    revenue.append(e)
+    
+## Extraction du profit sur 24h
+
+profit=[]
+j=6
+for i in range(147):
+    e= page.find_all('td')[j].text
+    e=e.replace('$','')
+    e=float(e)
+    j=j+8
+    profit.append(e)
+    
+## Extraction des devises minnées
+
+monnaie1=[]
+monnaie2=[]
+monnaie3=[]
+j=7
+for i in range(147):
+    n=len(page.find_all('td')[j].find_all('strong'))
+    if n==1:
+        monnaie1.append(page.find_all('td')[j].find_all('strong')[0].text)
+        monnaie2.append(None)
+        monnaie3.append(None)
+    if n==2:
+        monnaie1.append(page.find_all('td')[j].find_all('strong')[0].text)
+        monnaie2.append(page.find_all('td')[j].find_all('strong')[1].text)
+        monnaie3.append(None)
+    if n==3:
+        monnaie1.append(page.find_all('td')[j].find_all('strong')[0].text)
+        monnaie2.append(page.find_all('td')[j].find_all('strong')[1].text)
+        monnaie3.append(page.find_all('td')[j].find_all('strong')[2].text)
+    j=j+8
+    
+
+    
+df=pd.DataFrame({'Mineur':mineur,'Hashrate':hashrate2,'Power Consumption':power,'Date':date,'Revenus sur 24h':revenue,'Profit sur 24h':profit,'Monnaie 1':monnaie1,'Monnaie 2':monnaie2,'Monnaie 3':monnaie3})
+    
+df=df.assign(Energie=df['Power Consumption']/df['Hashrate'])
+df2=df.assign(Energie=np.log(df['Power Consumption']/df['Hashrate']))
+
+
+df['Date']= df['Date'].replace([0],40)
