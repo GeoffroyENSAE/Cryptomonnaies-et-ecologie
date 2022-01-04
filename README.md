@@ -4,4 +4,5 @@ Voici le Github présentant notre projet Python.
 
 
 Il est composé de : 
-    - Notebook_final : 
+
+    - Notebook_final : Projet avec le code et la rédaction
