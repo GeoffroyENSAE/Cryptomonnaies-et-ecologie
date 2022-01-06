@@ -16,3 +16,4 @@ Il est composé de :
     - Récupération et nettoyage des données du modèle-2 : Notebook de récupération des données sur les équipements 
     de minage, différentes de celles utilisées en I, utiles pour déterminer le poids des déchets électroniques en III
     
+    - Minage - un processus énergivore : Notebook annexe pour comprendre le fonctionnement théorique du minage
