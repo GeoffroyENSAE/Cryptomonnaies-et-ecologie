@@ -17,3 +17,10 @@ Il est composé de :
     de minage, différentes de celles utilisées en I, utiles pour déterminer le poids des déchets électroniques en III
     
     - Minage - un processus énergivore : Notebook annexe pour comprendre le fonctionnement théorique du minage
+    
+    - Tous les fichiers .csv et .json sont nos différentes bases de données. 
+    
+    Bonne lecture !
+    
+    N.B : Les bibliothèques "folium" et "geopandas" sont nécessaires à l'exécution du code, veuillez les installer 
+    si besoin.
