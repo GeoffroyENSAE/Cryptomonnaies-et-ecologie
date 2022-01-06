@@ -20,7 +20,7 @@ Il est composé de :
     
     - Tous les fichiers .csv et .json sont nos différentes bases de données. 
     
-    Bonne lecture !
+Bonne lecture !
     
-    N.B : Les bibliothèques "folium" et "geopandas" sont nécessaires à l'exécution du code, veuillez les installer 
-    si besoin.
+N.B : Les bibliothèques "folium" et "geopandas" sont nécessaires à l'exécution du code, veuillez les installer 
+si besoin.
